@@ -437,6 +437,7 @@
    -->
    <!--<field name="title" type="text" indexed="true" stored="true" />-->
    <field name="subject" type="text" indexed="true" stored="true"/>
+   <field name="desc" type="text" indexed="true" stored="true"/>
    <field name="sup_title" type="text" indexed="true" stored="true" multiValued="false" default="N/A"/>
    <field name="comments" type="text" indexed="true" stored="true"/>
    <field name="authors" type="textgen" indexed="true" stored="true" multiValued="true" default="N/A"/>
