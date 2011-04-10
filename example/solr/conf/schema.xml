@@ -45,15 +45,11 @@
     that avoids logging every request
 -->
 
-<schema name="example" version="1.2">
+<schema name="ODDemo" version="1.2">
   <!-- attribute "name" is the name of this schema and is only used for display purposes.
        Applications should change this to reflect the nature of the search collection.
        version="1.2" is Solr's version number for the schema syntax and semantics.  It should
-       not normally be changed by applications.
-       1.0: multiValued attribute did not exist, all fields are multiValued by nature
-       1.1: multiValued attribute introduced, false by default 
-       1.2: omitTermFreqAndPositions attribute introduced, true by default except for text fields.
-     -->
+       not normally be changed by applications.-->
 
   <types>
     <!-- field type definitions. The "name" attribute is
@@ -430,52 +426,53 @@
 <field name="all" type="text" multiValued="true"/>
 
 
-   <!-- Common metadata fields, named specifically to match up with
-     SolrCell metadata when parsing rich documents such as Word, PDF.
-     Some fields are multiValued only because Tika currently may return
-     multiple values for them.
-   -->
-   <!--<field name="title" type="text" indexed="true" stored="true" />-->
    <field name="subject" type="text" indexed="true" stored="true"/>
    <field name="desc" type="text" indexed="true" stored="true"/>
+   
+   <!--User supplied title-->
    <field name="sup_title" type="text" indexed="true" stored="true" multiValued="false" default="N/A"/>
+   <!--should be supplied by user-->
+   <field name="authors" type="text" indexed="true" stored="true" multiValued="true" default="N/A"/>
+   <!--store the exact author names for faceting purposes, otherwise faceting could be on first name only-->
+   <field name="authorFacet" type="string" indexed="true" stored="true" multiValued="true" default="N/A"/>
+   <field name="body" type="text" indexed="true" stored="true"/>
+   
+   
    <field name="comments" type="text" indexed="true" stored="true"/>
-   <field name="authors" type="textgen" indexed="true" stored="true" multiValued="true" default="N/A"/>
-   <field name="keywords" type="textgen" indexed="true" stored="true"/>
-   <field name="category" type="textgen" indexed="true" stored="true"/>
+
+   <field name="keywords" type="text" indexed="true" stored="true"/>
+   <field name="category" type="text" indexed="true" stored="true"/>
    <field name="content_type" type="string" indexed="true" stored="true" multiValued="true"/>
    <field name="last_modified" type="date" indexed="true" stored="true"/>
    <field name="links" type="string" indexed="true" stored="true" multiValued="true"/>
-   <field name="body" type="text" indexed="true" stored="true"/>
 
-<dynamicField name="ignored_*" type="ignored" multiValued="true"/>
-<dynamicField name="attr_*" type="textgen" indexed="true" stored="true" multiValued="true"/>
- <!--<dynamicField name="*" type="text" indexed="true" stored="true"/>-->
+	<!--used to save fields to the ignored type-->
+	<dynamicField name="ignored_*" type="ignored" multiValued="true"/>
+	
+	<!--used to save automatically created fields to -->
+	<dynamicField name="attr_*" type="textgen" indexed="true" stored="true" multiValued="true"/>
+
 </fields>
 
- <!-- Field to use to determine and enforce document uniqueness. 
-      Unless this field is marked with required="false", it will be a required field
-   -->
+ <!-- Field to use to determine and enforce document uniqueness. Unless this field is marked with required="false", it will be a required field.
+ 	Currently matches the primary key in the database of articles. -->
  <uniqueKey>id</uniqueKey>
 
  <!-- field for the QueryParser to use when an explicit fieldname is absent -->
  <defaultSearchField>all</defaultSearchField>
 
  <!-- SolrQueryParser configuration: defaultOperator="AND|OR" -->
- <solrQueryParser defaultOperator="OR"/>
+ <solrQueryParser defaultOperator="AND"/>
 
   <!-- copyField commands copy one field to another at the time a document
         is added to the index.  It's used either to index the same field differently,
         or to add multiple fields to the same field for easier/faster searching.  -->
-
+   <!--info supplied to authors needs to also be supplied to authorFacet-->
+   <copyField source="authors" dest="authorFacet"/>
+   
+   <!--everything should be searchable inside of all the default search field-->
    <copyField source="*" dest="all"/>
-   	
-   <!-- Above, multiple source fields are copied to the [text] field. 
-	  Another way to map multiple source fields to the same 
-	  destination field is to use the dynamic field syntax. 
-	  copyField also supports a maxChars to copy setting.  -->
-	   
-   <!-- <copyField source="*_t" dest="text" maxChars="3000"/> -->
+   
 
    <!-- copy name to alphaNameSort, a field designed for sorting by name -->
    <!-- <copyField source="name" dest="alphaNameSort"/> -->
